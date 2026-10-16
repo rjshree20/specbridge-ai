@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "SpecBridge AI"
+description = "Evidence-backed PRD-to-engineering gap reviews, saved reports, and protected review analytics."
+version = "1.0.0"
+id = "artifacts/specbridge"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22240
+
+[services.development]
+run = "pnpm --filter @workspace/specbridge run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/specbridge", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/specbridge/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22240"
+BASE_PATH = "/"
