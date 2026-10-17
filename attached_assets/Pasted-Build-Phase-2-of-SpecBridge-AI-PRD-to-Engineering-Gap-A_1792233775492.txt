@@ -1,0 +1,84 @@
+Build Phase 2 of **SpecBridge AI — PRD-to-Engineering Gap Analyzer**, a professional AI-assisted product management application.
+
+**Project context**
+
+SpecBridge AI helps Product Managers and Product Owners identify implementation gaps in PRDs before handing requirements to engineering teams.
+
+The product follows a logic-first architecture: input validation, deterministic rules, AI evaluation, output checks, storage, and structured results.
+
+**Current milestone: Structured Input Form Only**
+
+Build the initial application foundation using:
+- React with TypeScript
+- Tailwind CSS
+- Node.js with Express for the backend
+- A maintainable, modular project structure
+
+**UI requirements**
+
+Create a professional, responsive SaaS interface with a clean light theme and optional dark mode.
+
+Application name: SpecBridge AI
+
+Tagline: Bridge the gap between product requirements and engineering clarity.
+
+Include a sidebar with:
+- New Analysis
+- Analysis History
+- Admin Dashboard
+
+Only New Analysis should be fully functional at this stage. Mark the other two as Coming Soon.
+
+Create a structured PRD input form with:
+
+1. Feature Title — required
+2. Product / Project Name — optional
+3. Feature Description — required
+4. Target Users — optional
+5. PRD / Requirement Text — required multiline field
+6. Acceptance Criteria — optional multiline field
+7. Analyze PRD button
+8. Clear Form button
+
+**Validation requirements**
+
+- Required fields must not be empty.
+- Trim leading and trailing whitespace.
+- Require meaningful PRD text of at least 100 characters.
+- Limit PRD input to 20,000 characters.
+- Display helpful inline validation messages.
+- Prevent submission when inputs are invalid.
+- Provide visible character counts.
+- Preserve entered content when validation fails.
+
+**Backend requirements**
+
+Create an Express backend with a POST `/api/validate` endpoint.
+
+The endpoint must independently validate the input and return a structured validation response.
+
+Do not call an LLM.
+
+Do not generate fake analysis results.
+
+Do not create a database yet.
+
+The Analyze PRD button should call the validation endpoint. If validation succeeds, display a confirmation that the PRD passed initial validation and is ready for the upcoming logic-analysis stage.
+
+**Quality requirements**
+
+- Accessible form labels and keyboard navigation.
+- Clear loading and error states.
+- Responsive desktop and mobile layout.
+- No exposed secrets or hardcoded API keys.
+- Separate frontend and backend validation.
+- Include basic automated validation tests.
+- Update README with local run instructions.
+
+**Scope control**
+
+Do not implement the rule engine, AI integration, database persistence, or functional admin dashboard in this milestone.
+
+Preserve existing files in the repository, especially the `docs` folder and product brief.
+
+Implement only this checkpoint, run the application, and report the files created, tests executed, and functionality completed.
