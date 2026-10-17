@@ -1,0 +1,179 @@
+# SpecBridge AI — Checkpoint 3: Deterministic PRD Logic Engine
+
+We have completed Checkpoint 2: structured PRD input, frontend/backend validation, and automated validation tests.
+
+Now implement Checkpoint 3: a deterministic, explainable PRD analysis layer.
+
+**Important constraints**
+
+- Do not integrate an LLM or call any AI API.
+- Do not implement a database.
+- Do not build the admin dashboard.
+- Preserve the current application, validation endpoint, working tests, and existing UI.
+- Make the logic engine reusable for the later AI integration.
+- Do not generate fake AI conclusions.
+
+## 1. Core logic engine
+
+Create a separate server-side module such as `server/logic/prdAnalyzer.ts`, adapting the path to the existing architecture.
+
+Accept the already-validated structured PRD input.
+
+Analyze the feature description, PRD text, acceptance criteria, target users, and other relevant fields together.
+
+Generate candidate findings in three categories:
+
+- `ambiguity`
+- `missing_logic`
+- `undefined_inputs`
+
+Each finding must contain:
+
+- Unique rule ID
+- Category
+- Finding title
+- Description
+- Exact evidence from the submitted PRD, if present
+- Suggested engineering clarification
+- Severity: high, medium, or low
+- Detection method
+- Confidence signal
+- Status: `needs_ai_review`
+
+Do not invent quoted evidence. For an absence-based finding, report the exact text that triggered the concern where possible; otherwise set evidence to null and clearly describe the missing element.
+
+## 2. Deterministic rules
+
+Implement the following candidate-detection rules:
+
+R001 — Undefined actor or user role.
+
+R002 — Vague or subjective expressions such as "fast", "easy", "user-friendly", "appropriate", or "seamless", where measurable criteria may be needed.
+
+R003 — Incomplete conditional behavior: an explicitly stated trigger without a clear outcome.
+
+R004 — Missing error or failure behavior for a recognized action, using context-specific templates.
+
+R005 — Undefined input constraints for explicitly mentioned fields.
+
+R006 — Missing success or completion outcome.
+
+R007 — Potentially conflicting explicit numeric constraints or conditions.
+
+R008 — Unspecified expiration or reuse behavior for explicitly mentioned password-reset or verification links.
+
+R009 — Missing validation requirements for explicitly mentioned forms or data entry.
+
+R010 — Missing or undefined acceptance criteria.
+
+R010 must be a low-severity advisory, not automatically an implementation blocker.
+
+Use conservative logic. Do not trigger domain-specific rules for unrelated features.
+
+Do not claim comprehensive natural-language understanding or semantic contradiction detection. Unsupported cases should remain undetected rather than falsely diagnosed.
+
+## 3. False-positive controls
+
+- Search all submitted requirement fields before generating an absence-based candidate.
+- Use contextual keywords and recognized patterns rather than keyword absence alone.
+- Suppress candidates when the relevant detail is explicitly defined elsewhere.
+- Deduplicate overlapping findings.
+- Limit output to the seven highest-priority distinct candidates.
+- Allow zero findings when no supported rule triggers.
+- Do not infer an issue solely because a PRD is short.
+- Do not imply that absence of a detail always means an engineering defect.
+
+## 4. Confidence handling
+
+Show a deterministic detection-strength indicator: High, Medium, or Low.
+
+This is a heuristic indicator, not a calibrated probability that a finding is correct.
+
+Include the rule and matched evidence so that the output is explainable.
+
+## 5. API
+
+Preserve `/api/validate`.
+
+Create `POST /api/analyze-logic`.
+
+The endpoint must:
+1. Validate the submitted input independently.
+2. Execute the deterministic rule engine.
+3. Return structured findings and an execution summary.
+4. Return a valid empty findings array when no rule triggers.
+5. Handle malformed requests and unexpected errors.
+
+Include execution metadata such as rules evaluated, candidates identified, candidates suppressed/deduplicated, and execution duration.
+
+## 6. Frontend integration
+
+Connect the existing Analyze PRD button to the new logic endpoint.
+
+Preserve client-side validation.
+
+After successful validation, display:
+
+- Total review candidates
+- Findings grouped by category
+- Severity
+- Rule ID
+- Explanation
+- Exact evidence when available
+- Suggested engineering clarification
+- Detection strength
+- Clear label: "Rule-based candidate — awaiting AI review"
+
+If no rules trigger, display "No potential gaps detected by the current rule set." Do not claim that the PRD is guaranteed complete.
+
+Display an informative error message if the endpoint fails.
+
+Do not show raw JSON to the end user.
+
+## 7. Automated testing
+
+Write unit tests covering:
+
+- A complete specification with no unnecessary flags
+- An incomplete password-reset PRD
+- Vague terms without measurable criteria
+- Explicitly defined link expiry
+- Irrelevant domain-specific rules
+- Duplicate suppression
+- Invalid input
+- Empty candidate set
+- API error handling
+- Consistent results for identical inputs
+
+Include tests ensuring that all quoted evidence exists verbatim in the submitted input.
+
+Use normal synthetic product requirements as fixtures.
+
+## 8. Documentation
+
+Document:
+
+- Every rule and its detection conditions
+- Known limitations and expected false positives
+- How rules run before AI
+- How to execute automated tests
+- Example request and response
+
+Use a structured internal response schema, but render results as readable interface elements.
+
+## Completion
+
+Run the application and automated tests.
+
+Report:
+1. Files created or modified
+2. Rules implemented
+3. Test results
+4. Known limitations
+5. Confirmation that no AI API or database was introduced
+
+Do not start Checkpoint 4 or commit changes automatically. Stop after this milestone for review.
+
+---
+
+**The goal is not to find as many problems as possible. The goal is to identify a small number of defensible engineering-review candidates.**
